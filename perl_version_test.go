@@ -1103,6 +1103,70 @@ func TestPerlVersion_Stringify(t *testing.T) {
 	}
 }
 
+func TestVersion_Version(t *testing.T) {
+	tests := []struct {
+		version  string
+		expected []int64
+	}{
+		{".1", []int64{0, 100}},
+		{".1.2", []int64{0, 1, 2}},
+		{"0", []int64{0}},
+		{"0.0", []int64{0, 0}},
+		{"0.123", []int64{0, 123}},
+		{"01", []int64{1}},
+		{"01.0203", []int64{1, 20, 300}},
+		{"1.", []int64{1, 0}},
+		{"1.00", []int64{1, 0}},
+		{"1.00001", []int64{1, 0, 10}},
+		{"1.002", []int64{1, 2}},
+		{"1.002003", []int64{1, 2, 3}},
+		{"1.00203", []int64{1, 2, 30}},
+		{"1.0023", []int64{1, 2, 300}},
+		{"1.02", []int64{1, 20}},
+		{"1.0203", []int64{1, 20, 300}},
+		{"1.02_03", []int64{1, 20, 300}},
+		{"1.2", []int64{1, 200}},
+		{"1.2.3", []int64{1, 2, 3}},
+		{"1.2345_01", []int64{1, 234, 501}},
+		{"12.345", []int64{12, 345}},
+		{"42", []int64{42}},
+		{"undef", []int64{0}},
+		{"v0", []int64{0, 0, 0}},
+		{"v0.0.0", []int64{0, 0, 0}},
+		{"v0.1.2", []int64{0, 1, 2}},
+		{"v01", []int64{1, 0, 0}},
+		{"v01.02.03", []int64{1, 2, 3}},
+		{"v1", []int64{1, 0, 0}},
+		{"v1.02_03", []int64{1, 203, 0}},
+		{"v1.2", []int64{1, 2, 0}},
+		{"v1.2.3", []int64{1, 2, 3}},
+		{"v1.2.3.4", []int64{1, 2, 3, 4}},
+		{"v1.2.30", []int64{1, 2, 30}},
+		{"v1.2.3_0", []int64{1, 2, 30}},
+		{"v1.2345.6", []int64{1, 2345, 6}},
+		{"v1.2_3", []int64{1, 23, 0}},
+	}
+	for _, test := range tests {
+		pv, err := Parse(test.version)
+		if err != nil {
+			t.Fatalf("NewPerlVersion(%q) returned error: %v",
+				test.version, err)
+		}
+		v := pv.Version()
+		if !reflect.DeepEqual(v, test.expected) {
+			t.Errorf("NewPerlVersion(%q).Version() => %v,"+
+				" expected %v", test.version, v, test.expected)
+		}
+		// make sure it's a copy, not a reference
+		v[0] = -1
+		if pv.Version()[0] == -1 {
+			t.Errorf("NewPerlVersion(%q).Version() returned a "+
+				"reference to the internal version slice",
+				test.version)
+		}
+	}
+}
+
 func TestVersion_MarshalJSON(t *testing.T) {
 	input := Version{
 		original: "v1.2.3",

@@ -127,6 +127,12 @@ func (v *Version) MarshalJSON() ([]byte, error) {
 	return json.Marshal(&data)
 }
 
+// Version returns the version as a slice of integers.
+func (v *Version) Version() []int64 {
+	// return duplicate
+	return append([]int64{}, v.version...)
+}
+
 // UnmarshalJSON implements the json.Unmarshaler interface. This allows for
 // extracting the version from a cached version.
 func (v *Version) UnmarshalJSON(data []byte) error {
