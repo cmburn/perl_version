@@ -53,7 +53,7 @@ func (v *Version) IsAlpha() bool {
 // the beginning of the version. For example, "v1.2.3" is a qv version, while
 // "1.2.3" is not. The versions are not equal either- "1.2.3" is represented
 // as "v1.200.300", and "v1.2.3" is still just "v1.2.3".
-func (v Version) IsQv() bool {
+func (v *Version) IsQv() bool {
 	return v.qv
 }
 
